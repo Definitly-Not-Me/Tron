@@ -180,3 +180,8 @@ class TestReset:
 		assert p2.id == 2, "P2 should spawn with id 2"
 		assert p1.alive is True, "Player cannot spawn dead!"
 		assert p2.alive is True
+
+	def test_numpy_grid_shape_match_arena(self):
+		world = reset((30, 20), 3)
+
+		assert world.grid.shape == (20, 30)

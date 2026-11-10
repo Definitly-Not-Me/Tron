@@ -204,13 +204,14 @@ def step(world: World, action: Action) -> Alive | Dead:
 ### ------- Setup --------
 
 
-def reset(screen_dim: tuple[int, int], seed: int) -> World:
-	grid = np.zeros(screen_dim, dtype=np.int8)
+def reset(arena_dim: tuple[int, int], seed: int) -> World:
+	W, H = arena_dim
+	grid = np.zeros((H, W), dtype=np.int8)
 
 	P1 = Player(
-		id=1, x=screen_dim[0] // 2, y=screen_dim[1] - 6, direction=Direction.UP
+		id=1, x=arena_dim[0] // 2, y=arena_dim[1] - 6, direction=Direction.UP
 	)
-	P2 = Player(id=2, x=screen_dim[0] // 2, y=5, direction=Direction.DOWN)
+	P2 = Player(id=2, x=arena_dim[0] // 2, y=5, direction=Direction.DOWN)
 
 	grid[P1.y, P1.x] = 1
 	grid[P2.y, P2.x] = 2

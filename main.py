@@ -8,7 +8,7 @@ from engine import Action, Dead, Direction, reset, step
 from render import Renderer
 
 FPS = 20
-W, H = 44, 44
+W, H = 64, 40
 
 
 def human_action(keys, current_dir: Direction) -> tuple[Direction, bool]:
@@ -28,7 +28,7 @@ def main():
 	pygame.init()
 
 	clock = pygame.time.Clock()
-	world = reset((H, W), seed=42)
+	world = reset((W, H), seed=42)
 	render = Renderer(world)
 	over = False
 
@@ -40,7 +40,7 @@ def main():
 
 		if over:
 			if pygame.key.get_pressed()[pygame.K_r]:
-				world = reset((H, W), seed=None)
+				world = reset((W, H), seed=None)
 				over = False
 			clock.tick(FPS)
 			continue
