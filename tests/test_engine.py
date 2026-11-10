@@ -22,11 +22,11 @@ class TestGetPath:
 		path = get_path(p, Direction.RIGHT)
 		assert path == [(6, 5)]
 
-	def test_boost_double_speed(self):
+	def test_boost_triple_speed(self):
 		p = Player(x=5, y=5, id=1, direction=Direction.RIGHT, boost_active=True)
 		path = get_path(p, Direction.RIGHT)
 
-		assert path == [(6, 5), (7, 5)]
+		assert path == [(6, 5), (7, 5), (8, 5)]
 
 	def test_reversal_no_op(self):
 		p = Player(x=5, y=5, id=1, direction=Direction.RIGHT)

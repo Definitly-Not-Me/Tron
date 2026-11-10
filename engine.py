@@ -6,7 +6,8 @@ from enum import IntEnum
 import numpy as np
 
 ### Config
-BOOST_SPEED_GAIN = 1
+BOOST_SPEED_GAIN = 2
+STARTING_BOOST: int = 8
 
 ### -------- Types -----------
 
@@ -38,6 +39,7 @@ class Player:
 	speed: int = 1
 	alive: bool = True
 	boost_active: bool = False
+	boost_remaining: int = STARTING_BOOST
 
 
 @dataclass(frozen=True)
@@ -97,7 +99,11 @@ def get_path(player: Player, direction: Direction) -> list[tuple[int, int]]:
 	"""
 	direction = resolve_direction(direction, player.direction)
 
-	speed: int = player.speed + (BOOST_SPEED_GAIN if player.boost_active else 0)
+	speed: int = player.speed + (
+		BOOST_SPEED_GAIN
+		if player.boost_active and player.boost_remaining
+		else 0
+	)
 	cells = []
 	nx, ny = player.x, player.y
 
@@ -142,15 +148,19 @@ def move(player: Player, direction: Direction, world: World) -> Move:
 				player_path[:i],
 			)
 
+	print(f"Boost remaining for Player {player.id} = {player.boost_remaining}")
 	return Move(
 		Player(
 			x=player_path[-1][0],
 			y=player_path[-1][1],
 			direction=direction,
 			speed=player.speed,
-			boost_active=player.boost_active,
+			boost_active=False,
 			alive=True,
 			id=player.id,
+			boost_remaining=player.boost_remaining - 1
+			if player.boost_active and player.boost_remaining > 0
+			else player.boost_remaining,
 		),
 		None,
 		player_path,
@@ -179,7 +189,7 @@ def step(world: World, action: Action) -> Alive | Dead:
 	)
 
 	print(f">> P1{(P1.x, P1.y)} | \t P2{(P2.x, P2.y)}")
-	print("-"*15)
+	print("-" * 15)
 
 	if not P1.alive and not P2.alive:
 		return Dead(winner=None, world=new_world, autopsy=None)
@@ -187,7 +197,6 @@ def step(world: World, action: Action) -> Alive | Dead:
 		return Dead(winner="P2", world=new_world, autopsy=move_p1.cause)
 	if not P2.alive:
 		return Dead(winner="P1", world=new_world, autopsy=move_p2.cause)
-
 
 	return Alive(world=new_world)
 
