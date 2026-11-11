@@ -11,11 +11,12 @@ P2_COLOR = (255, 60, 60)
 GRID_COLOR = (30, 30, 30)
 WHITE = (225, 225, 225)
 GREEN = (0, 255, 0)
+GOLD = (255, 215, 0)
 PLAYERS_COLORS = [P1_COLOR, P2_COLOR]
-TRAIL_GLOW = [
-	[(5, (0, 40, 70)), (2, (0, 90, 140)), (0, P1_COLOR)],
-	[(5, (70, 30, 0)), (2, (140, 60, 0)), (0, P2_COLOR)],
-]
+ARENA_BORDER_COLOR = (10, 14, 20)
+ARENA_BORDER_WIDTH = 4
+ARENA_BORDER_RADIUS = 8
+ARENA_BG = (0, 0, 1)
 
 
 class Renderer:
@@ -55,6 +56,11 @@ class Renderer:
 		h, w = world.grid.shape
 		self._center_arena()
 		self.screen.fill(BG)
+		arena = pygame.Rect(self.off_x, self.off_y, self.arena_w, self.arena_h)
+
+		pygame.draw.rect(
+			self.screen, ARENA_BG, arena, border_radius=ARENA_BORDER_RADIUS
+		)
 
 		for x in range(w + 1):
 			pygame.draw.line(
@@ -96,6 +102,14 @@ class Renderer:
 				self._rect(p.x, p.y, CELL // 3),
 				border_radius=1,
 			)
+
+		pygame.draw.rect(
+			self.screen,
+			ARENA_BORDER_COLOR,
+			arena,
+			width=ARENA_BORDER_WIDTH,
+			border_radius=ARENA_BORDER_RADIUS,
+		)
 
 		pygame.display.flip()
 
