@@ -23,6 +23,7 @@ class Autopsy(IntEnum):
 	SUICIDE = 0
 	OUT_OF_BOUND = 1
 	TAIL_CRASH = 2
+	HEAD_ON = 3
 
 
 DX = [0, 1, 0, -1]
@@ -148,7 +149,7 @@ def move(player: Player, direction: Direction, world: World) -> Move:
 				player_path[:i],
 			)
 
-	print(f"Boost remaining for Player {player.id} = {player.boost_remaining}")
+	# print(f"Boost remaining for Player {player.id} = {player.boost_remaining}")
 	return Move(
 		Player(
 			x=player_path[-1][0],
@@ -188,11 +189,11 @@ def step(world: World, action: Action) -> Alive | Dead:
 		rng_state=world.rng_state,
 	)
 
-	print(f">> P1{(P1.x, P1.y)} | \t P2{(P2.x, P2.y)}")
-	print("-" * 15)
+	# print(f">> P1{(P1.x, P1.y)} | \t P2{(P2.x, P2.y)}")
+	# print("-" * 15)
 
 	if not P1.alive and not P2.alive:
-		return Dead(winner=None, world=new_world, autopsy=None)
+		return Dead(winner=None, world=new_world, autopsy=Autopsy.HEAD_ON)
 	if not P1.alive:
 		return Dead(winner="P2", world=new_world, autopsy=move_p1.cause)
 	if not P2.alive:

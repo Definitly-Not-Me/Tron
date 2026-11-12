@@ -1,6 +1,8 @@
 import random
 from collections import deque
 
+import numpy as np
+
 from engine import DX, DY, Direction, Player, World, move
 
 
@@ -10,7 +12,10 @@ def _find(world: World, playerid: int) -> Player:
 
 class Controller:
 	def choose_move(
-		self, world: World, bot_id: int, rng: random.Random
+		self,
+		world: World,
+		bot_id: int,
+		rng: random.Random | np.random.Generator,
 	) -> Direction:
 		raise NotImplementedError
 
@@ -70,6 +75,8 @@ class NaiveBot(Controller):
 
 
 def _open_distance(world: World, me: Player, dir: Direction) -> int:
+	# TODO: fix BFS part. Idk why but the bot act weird
+
 	grid = world.grid
 	grid_h, grid_w = grid.shape
 	sx = me.x + DX[dir]

@@ -1,14 +1,26 @@
 # main.py
 import random
 import sys
+from random import choice
 
 import pygame
 
+from bots import BlockerBot, NaiveBot, RandomBot, WallHuggerBot
 from engine import Action, Dead, Direction, reset, step
 from render import Renderer
 
-FPS = 20
+FPS = 25
 W, H = 64, 40
+BOTS = [NaiveBot, BlockerBot, WallHuggerBot, RandomBot]
+
+
+def new_game(seed: int | None = None):
+	world = reset((W, H), seed=42)
+	bot = choice(BOTS)()
+
+	print("New game started with bot ", bot.name())
+
+	return world, bot
 
 
 def human_action(keys, current_dir: Direction) -> tuple[Direction, bool]:
@@ -28,9 +40,10 @@ def main():
 	pygame.init()
 
 	clock = pygame.time.Clock()
-	world = reset((W, H), seed=42)
+	world, bot = new_game(seed=42)
 	render = Renderer(world)
 	over = False
+	rng = random.Random(42)
 
 	while True:
 		for event in pygame.event.get():
@@ -40,16 +53,17 @@ def main():
 
 		if over:
 			if pygame.key.get_pressed()[pygame.K_r]:
-				world = reset((W, H), seed=None)
+				world, bot = new_game(42)
 				over = False
 			clock.tick(FPS)
 			continue
 
 		keys = pygame.key.get_pressed()
 		p1_dir, p1_boost = human_action(keys, world.players[0].direction)
-		p2_dir = random.choice(
-			[Direction.RIGHT, Direction.LEFT, Direction.DOWN]
-		)  # placeholder
+		# p2_dir = random.choice(
+		# 	[Direction.RIGHT, Direction.LEFT, Direction.DOWN]
+		# )  # placeholder
+		p2_dir = bot.choose_move(world, 2, rng)
 		p2_boost = False
 
 		action = Action(
