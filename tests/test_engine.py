@@ -131,7 +131,7 @@ class TestStep:
 		assert isinstance(result, Dead), (
 			"Player should die when running in walls"
 		)
-		assert result.winner == "P1"
+		assert result.winner_id == 1
 
 	def test_draw(self):
 		grid = np.zeros((10, 10), dtype=np.int8)
@@ -163,7 +163,7 @@ class TestStep:
 		assert isinstance(result, Dead), (
 			"Player should die when steping on a trail"
 		)
-		assert result.winner == "P2", (
+		assert result.winner_id == 2, (
 			"Last standing Player should be declared winner"
 		)
 		assert result.autopsy is Autopsy.TAIL_CRASH

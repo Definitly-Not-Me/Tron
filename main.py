@@ -73,7 +73,7 @@ def main():
 
 		if isinstance(result, Dead):
 			over = True
-			render.draw_game_over(result.world, result.winner)
+			render.draw_game_over(result.world, result.winner_id)
 			clock.tick(FPS)
 			continue
 

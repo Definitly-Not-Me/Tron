@@ -76,7 +76,7 @@ class Alive:
 class Dead:
 	world: World
 	autopsy: Autopsy | None
-	winner: str | None = None
+	winner_id: int | None = None
 
 
 @dataclass(frozen=True)
@@ -202,11 +202,11 @@ def step(world: World, action: Action) -> Alive | Dead:
 	# print("-" * 15)
 
 	if not P1.alive and not P2.alive:
-		return Dead(winner=None, world=new_world, autopsy=Autopsy.HEAD_ON)
+		return Dead(winner_id=None, world=new_world, autopsy=Autopsy.HEAD_ON)
 	if not P1.alive:
-		return Dead(winner="P2", world=new_world, autopsy=move_p1.cause)
+		return Dead(winner_id=2, world=new_world, autopsy=move_p1.cause)
 	if not P2.alive:
-		return Dead(winner="P1", world=new_world, autopsy=move_p2.cause)
+		return Dead(winner_id=1, world=new_world, autopsy=move_p2.cause)
 
 	return Alive(world=new_world)
 

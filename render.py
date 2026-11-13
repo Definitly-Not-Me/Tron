@@ -113,17 +113,17 @@ class Renderer:
 
 		pygame.display.flip()
 
-	def draw_game_over(self, world: World, winner: str | None):
+	def draw_game_over(self, world: World, winner_id: int | None):
 		self.draw(world)
 		overlay = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
 		overlay.fill((0, 0, 0, 128))
 		self.screen.blit(overlay, (0, 0))
 
-		text = "DRAW" if winner is None else f"{winner.upper()} WINS!"
+		text = "DRAW" if winner_id is None else f"P{winner_id} WINS!"
 		color = (
 			GREEN
-			if winner is None
-			else PLAYERS_COLORS[int(str(winner)[-1]) - 1]
+			if winner_id is None
+			else PLAYERS_COLORS[winner_id - 1]
 		)
 		font = pygame.font.Font(None, CELL * 4)
 
