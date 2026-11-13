@@ -111,9 +111,6 @@ class TronEnv(gym.Env):
 		engine_action = Action(
 			p1_dir=opp_move, p2_dir=direction, p2_boost=boost
 		)
-		print(
-			f"P1_dir: {int(opp_move)}\t | P2_dir: {int(direction)}",
-		)
 		outcome = get_outcome(self.world, engine_action)
 		self.world = outcome.world
 
