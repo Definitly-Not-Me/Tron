@@ -145,8 +145,10 @@ class TestStep:
 		action = Action(p1_dir=Direction.RIGHT, p2_dir=Direction.LEFT)
 		result = step(world, action)
 		assert isinstance(result, Dead)
-		assert result.winner is None, "Heads-on collision should result in draw"
-		assert result.autopsy is None
+		assert result.winner_id is None, (
+			"Heads-on collision should result in draw"
+		)
+		assert result.autopsy is Autopsy.HEAD_ON
 
 	def test_trail_death(self, world):
 		grid = np.zeros((10, 10), dtype=np.int8)
