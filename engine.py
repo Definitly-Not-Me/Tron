@@ -214,7 +214,7 @@ def step(world: World, action: Action) -> Alive | Dead:
 ### ------- Setup --------
 
 
-def reset(arena_dim: tuple[int, int], seed: int) -> World:
+def reset(arena_dim: tuple[int, int], seed: int | None = None) -> World:
 	W, H = arena_dim
 	grid = np.zeros((H, W), dtype=np.int8)
 
