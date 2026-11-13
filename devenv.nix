@@ -24,6 +24,12 @@
         gymnasium
       ]
     );
+    venv = {
+      enable = true;
+      requirements = ''
+        ppe-debug
+      '';
+    };
     uv = {
       enable = true;
     };

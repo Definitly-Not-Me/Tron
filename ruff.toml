@@ -19,10 +19,12 @@ select = [
 
 ignore = [
     "E501",  # line too long — let the formatter handle it
+    "E101",
+    "RUF012"
 ]
 
 [lint.per-file-ignores]
-"tests/**" = ["S101", "PLR2004", "E712"]       # allow assert in tests
+"tests/**" = ["S101", "PLR2004", "E712", "RUF059"]
 "__init__.py" = ["F401"]    # allow unused imports in __init__
 
 [format]
