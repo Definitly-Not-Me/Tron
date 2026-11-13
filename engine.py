@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass, replace
 from enum import IntEnum
 
@@ -113,6 +114,13 @@ def get_path(player: Player, direction: Direction) -> list[tuple[int, int]]:
 		ny += DY[direction]
 		cells.append((nx, ny))
 
+	if not cells:
+		cells = [(player.x, player.y)]
+		warnings.warn(
+			f"Player {player.id}'s path didn't resolve. Cannot step further",
+			stacklevel=2,
+		)
+
 	return cells
 
 
@@ -150,6 +158,7 @@ def move(player: Player, direction: Direction, world: World) -> Move:
 			)
 
 	# print(f"Boost remaining for Player {player.id} = {player.boost_remaining}")
+
 	return Move(
 		Player(
 			x=player_path[-1][0],
