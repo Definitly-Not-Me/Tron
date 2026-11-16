@@ -9,6 +9,7 @@ import numpy as np
 ### Config
 BOOST_SPEED_GAIN = 2
 STARTING_BOOST: int = 8
+MIN_GRID = 14
 
 ### -------- Types -----------
 
@@ -198,9 +199,6 @@ def step(world: World, action: Action) -> Alive | Dead:
 		rng_state=world.rng_state,
 	)
 
-	# print(f">> P1{(P1.x, P1.y)} | \t P2{(P2.x, P2.y)}")
-	# print("-" * 15)
-
 	if not P1.alive and not P2.alive:
 		return Dead(winner_id=None, world=new_world, autopsy=Autopsy.HEAD_ON)
 	if not P1.alive:
@@ -217,6 +215,9 @@ def step(world: World, action: Action) -> Alive | Dead:
 def reset(arena_dim: tuple[int, int], seed: int | None = None) -> World:
 	W, H = arena_dim
 	grid = np.zeros((H, W), dtype=np.int8)
+
+	if any(d for d in grid.shape if d < MIN_GRID):
+		raise ValueError("Grid size must be at least 10x10")
 
 	P1 = Player(
 		id=1, x=arena_dim[0] // 2, y=arena_dim[1] - 6, direction=Direction.UP
