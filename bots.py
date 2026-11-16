@@ -16,7 +16,7 @@ class Controller:
 		world: World,
 		bot_id: int,
 		rng: random.Random | np.random.Generator,
-	) -> Direction:
+	) -> tuple[Direction, bool]:
 		raise NotImplementedError
 
 	def branches(self, me: Player) -> list[Direction]:
@@ -42,10 +42,12 @@ class RandomBot(Controller):
 
 	def choose_move(
 		self, world: World, bot_id: int, rng: random.Random
-	) -> Direction:
+	) -> tuple[Direction, bool]:
 		legal = self.legal_moves(world, bot_id)
 
-		return rng.choice(legal) if legal else _find(world, bot_id).direction
+		return Direction(
+			rng.choice(legal) if legal else _find(world, bot_id).direction
+		), False
 
 	def name(self):
 		return "Randombot"
@@ -58,17 +60,17 @@ class NaiveBot(Controller):
 
 	def choose_move(
 		self, world: World, bot_id: int, rng: random.Random
-	) -> Direction:
+	) -> tuple[Direction, bool]:
 		me = _find(world, bot_id)
 		legal = self.legal_moves(world, bot_id)
 
 		if not legal:
-			return me.direction
+			return me.direction, False
 
 		if me.direction in legal:
-			return me.direction
+			return me.direction, False
 
-		return rng.choice(legal)
+		return Direction(rng.choice(legal)), False
 
 	def name(self):
 		return "NaiveBot"
@@ -110,17 +112,19 @@ class WallHuggerBot(Controller):
 
 	def choose_move(
 		self, world: World, bot_id: int, rng: random.Random
-	) -> Direction:
+	) -> tuple[Direction, bool]:
 		me = _find(world, bot_id)
 		legal = self.legal_moves(world, bot_id)
 
 		if not legal:
-			return me.direction
+			return me.direction, False
 
 		scored = [(_open_distance(world, me, d), d) for d in legal]
 		best = max(score for score, _ in scored)
 
-		return rng.choice([d for score, d in scored if score == best])
+		return Direction(
+			rng.choice([d for score, d in scored if score == best])
+		), False
 
 	def name(self):
 		return "WallHugger"
@@ -133,7 +137,7 @@ class BlockerBot(Controller):
 
 	def choose_move(
 		self, world: World, bot_id: int, rng: random.Random
-	) -> Direction:
+	) -> tuple[Direction, bool]:
 
 		PROJECT_STEPS = 3
 		me = _find(world, bot_id)
@@ -143,7 +147,7 @@ class BlockerBot(Controller):
 		x, y = opp.x, opp.y
 
 		if not legal:
-			return me.direction
+			return me.direction, False
 
 		for _ in range(PROJECT_STEPS):
 			x += DX[opp.direction]
@@ -156,7 +160,9 @@ class BlockerBot(Controller):
 
 		scored = [(interception_cost(d), d) for d in legal]
 		best = min(score for score, _ in scored)
-		return rng.choice([d for score, d in scored if score == best])
+		return Direction(
+			rng.choice([d for score, d in scored if score == best])
+		), False
 
 	def name(self):
 		return "BlockerBot"

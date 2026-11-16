@@ -60,11 +60,7 @@ def main():
 
 		keys = pygame.key.get_pressed()
 		p1_dir, p1_boost = human_action(keys, world.players[0].direction)
-		# p2_dir = random.choice(
-		# 	[Direction.RIGHT, Direction.LEFT, Direction.DOWN]
-		# )  # placeholder
-		p2_dir = bot.choose_move(world, 2, rng)
-		p2_boost = False
+		p2_dir, p2_boost = bot.choose_move(world, 2, rng)
 
 		action = Action(
 			p1_dir=p1_dir, p2_dir=p2_dir, p1_boost=p1_boost, p2_boost=p2_boost
