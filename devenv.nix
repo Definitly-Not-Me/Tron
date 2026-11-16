@@ -22,6 +22,7 @@
         pygame
         pytest
         gymnasium
+        matplotlib
       ]
     );
     venv = {
