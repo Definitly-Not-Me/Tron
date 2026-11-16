@@ -38,10 +38,9 @@ class TestStep:
 			print("Action", action)
 			obs, reward, terminated, truncated, info = env.step(action)
 
-			print("Obs: ", obs)
-			# if terminated:
-			# 	print("Env terminated early! Restarting...", flush=True)
-			# 	env.reset(seed=0)
+			if terminated:
+				print("Env terminated early! Restarting...", flush=True)
+				env.reset(seed=0)
 			assert env.observation_space.contains(obs), (
 				"Observation space should contain recent observations"
 			)
@@ -61,6 +60,12 @@ class TestStep:
 				break
 		assert truncated or terminated
 		env.close()
+
+	def test_actions_are_unique(self, env):
+		for i, this_act in enumerate(env._action_map):
+			for j, other_act in enumerate(env._action_map):
+				if i != j:
+					assert this_act != other_act
 
 
 class TestHeadless:
