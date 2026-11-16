@@ -150,7 +150,7 @@ class TestStep:
 		)
 		assert result.autopsy is Autopsy.HEAD_ON
 
-	def test_trail_death(self, world):
+	def test_trail_death(self):
 		grid = np.zeros((10, 10), dtype=np.int8)
 		grid[5, 7] = 2  # P2's trail at (x=7, y=5)
 		world = World(
@@ -169,6 +169,22 @@ class TestStep:
 			"Last standing Player should be declared winner"
 		)
 		assert result.autopsy is Autopsy.TAIL_CRASH
+
+	def test_collision_one_cell_apart(self):
+		grid = np.zeros((10, 10), dtype=np.int8)
+		world = World(
+			grid=grid,
+			players=[
+				Player(x=5, y=5, id=1, direction=Direction.RIGHT),
+				Player(x=7, y=5, id=2, direction=Direction.LEFT),
+			],
+		)
+
+		action = Action(p1_dir=Direction.RIGHT, p2_dir=Direction.LEFT)
+		result = step(world, action)
+
+		assert isinstance(result, Dead)
+		assert result.autopsy == Autopsy.HEAD_ON
 
 
 class TestReset:

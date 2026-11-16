@@ -3,6 +3,7 @@ from __future__ import annotations
 import warnings
 from dataclasses import dataclass, replace
 from enum import IntEnum
+from itertools import takewhile
 
 import numpy as np
 
@@ -125,6 +126,45 @@ def get_path(player: Player, direction: Direction) -> list[tuple[int, int]]:
 	return cells
 
 
+def resolve_moves(players_move: list[Move], world: World):
+
+	resolved_moves = []
+
+	intersection = (
+		set.intersection(
+			*[
+				{(p.x, p.y)} | set(players_move[p.id - 1].path)
+				for p in world.players
+			]
+		)
+		or set()
+	)
+
+	if not intersection:
+		return players_move
+
+	stop_point = next(iter(intersection))
+	for move in players_move:
+		player = move.player
+		player_path = move.path
+		resolved_path = list(
+			takewhile(lambda x: x not in intersection, player_path)
+		)
+		resolved_player = replace(
+			player, x=stop_point[0], y=stop_point[1], alive=False
+		)
+		resolved_move = replace(
+			move,
+			path=resolved_path,
+			player=resolved_player,
+			cause=Autopsy.HEAD_ON,
+		)
+
+		resolved_moves.append(resolved_move)
+
+	return resolved_moves
+
+
 def move(player: Player, direction: Direction, world: World) -> Move:
 	direction = resolve_direction(direction, player.direction)
 	player_path = get_path(player, direction)
@@ -182,8 +222,9 @@ def step(world: World, action: Action) -> Alive | Dead:
 	p1 = replace(world.players[0], boost_active=action.p1_boost)
 	p2 = replace(world.players[1], boost_active=action.p2_boost)
 
-	move_p1 = move(p1, action.p1_dir, world)
-	move_p2 = move(p2, action.p2_dir, world)
+	_move_p1 = move(p1, action.p1_dir, world)
+	_move_p2 = move(p2, action.p2_dir, world)
+	move_p1, move_p2 = resolve_moves([_move_p1, _move_p2], world)
 
 	P1 = move_p1.player
 	P2 = move_p2.player
