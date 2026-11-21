@@ -1,6 +1,6 @@
 ## Game visual
 FPS = 25
-ARENA_DIM = 40, 64
+ARENA_DIM = 64, 40
 CELL = 30
 MARGIN = 40
 TRAIL_MARGIN = 1
