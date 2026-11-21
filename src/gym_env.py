@@ -63,7 +63,7 @@ class TronEnv(gym.Env):
 			"steps": dead_world.world.tick,
 			"agent_survived": dead_world.world.players[self.agentid - 1].alive,
 			"grid_size": self.grid_size,
-			"opponent": self.opp.name(),
+			"opponent": self.opp.name,
 		}
 
 	def reset(self, *, seed=None, options=None) -> tuple[np.ndarray, dict]:
@@ -90,7 +90,7 @@ class TronEnv(gym.Env):
 		observation = self._get_obs()
 		info = {
 			"grid_size": self.grid_size,
-			"opponent": self.opp.name(),
+			"opponent": self.opp.name,
 		}
 
 		return observation, info
@@ -123,7 +123,7 @@ class TronEnv(gym.Env):
 				terminated = False
 				info = {
 					"grid_size": self.grid_size,
-					"opponent": self.opp.name(),
+					"opponent": self.opp.name,
 				}
 
 		truncated = self.world.tick >= self.max_ticks

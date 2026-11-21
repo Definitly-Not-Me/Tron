@@ -11,6 +11,8 @@ def _find(world: World, playerid: int) -> Player:
 
 
 class Controller:
+	name: str = "unk"
+
 	def choose_move(
 		self,
 		world: World,
@@ -27,10 +29,6 @@ class Controller:
 
 		return [d for d in self.branches(me) if move(me, d, world).player.alive]
 
-	# @property
-	def name(self):
-		raise NotImplementedError
-
 
 ## ------ Bots ---------
 
@@ -40,8 +38,13 @@ class RandomBot(Controller):
 	Level 0
 	"""
 
+	name = "Random"
+
 	def choose_move(
-		self, world: World, bot_id: int, rng: random.Random
+		self,
+		world: World,
+		bot_id: int,
+		rng: random.Random | np.random.Generator,
 	) -> tuple[Direction, bool]:
 		legal = self.legal_moves(world, bot_id)
 
@@ -49,17 +52,19 @@ class RandomBot(Controller):
 			rng.choice(legal) if legal else _find(world, bot_id).direction
 		), False
 
-	def name(self):
-		return "Randombot"
-
 
 class NaiveBot(Controller):
 	"""
 	Level 1
 	"""
 
+	name = "Naive"
+
 	def choose_move(
-		self, world: World, bot_id: int, rng: random.Random
+		self,
+		world: World,
+		bot_id: int,
+		rng: random.Random | np.random.Generator,
 	) -> tuple[Direction, bool]:
 		me = _find(world, bot_id)
 		legal = self.legal_moves(world, bot_id)
@@ -71,9 +76,6 @@ class NaiveBot(Controller):
 			return me.direction, False
 
 		return Direction(rng.choice(legal)), False
-
-	def name(self):
-		return "NaiveBot"
 
 
 def _open_distance(world: World, me: Player, dir: Direction) -> int:
@@ -110,8 +112,13 @@ class WallHuggerBot(Controller):
 	Level 2
 	"""
 
+	name = "WallHugger"
+
 	def choose_move(
-		self, world: World, bot_id: int, rng: random.Random
+		self,
+		world: World,
+		bot_id: int,
+		rng: random.Random | np.random.Generator,
 	) -> tuple[Direction, bool]:
 		me = _find(world, bot_id)
 		legal = self.legal_moves(world, bot_id)
@@ -126,17 +133,19 @@ class WallHuggerBot(Controller):
 			rng.choice([d for score, d in scored if score == best])
 		), False
 
-	def name(self):
-		return "WallHugger"
-
 
 class BlockerBot(Controller):
 	"""
 	Level 3
 	"""
 
+	name = "Blocker"
+
 	def choose_move(
-		self, world: World, bot_id: int, rng: random.Random
+		self,
+		world: World,
+		bot_id: int,
+		rng: random.Random | np.random.Generator,
 	) -> tuple[Direction, bool]:
 
 		PROJECT_STEPS = 3
@@ -155,6 +164,7 @@ class BlockerBot(Controller):
 			targets.append((x, y))
 
 			def interception_cost(dir: Direction) -> int:
+				assert targets is not None
 				nx, ny = me.x + DX[dir], me.y + DY[dir]
 				return min(abs(nx - tx) + abs(ny - ty) for tx, ty in targets)
 
@@ -163,6 +173,3 @@ class BlockerBot(Controller):
 		return Direction(
 			rng.choice([d for score, d in scored if score == best])
 		), False
-
-	def name(self):
-		return "BlockerBot"
