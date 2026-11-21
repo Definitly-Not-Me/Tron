@@ -1,15 +1,17 @@
 import numpy as np
 import pytest
 
-from engine import (
+from config import (
+	N_BINS_COORD,
+	N_BINS_DIST,
+	N_FEATURES,
+)
+from src.engine import (
 	Direction,
 	Player,
 	World,
 )
-from model import (
-	N_BINS_COORD,
-	N_BINS_DIST,
-	N_FEATURES,
+from src.model import (
 	_bin_coord,
 	_bin_dist,
 	_one_hot,

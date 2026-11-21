@@ -2,8 +2,8 @@
 import numpy as np
 import pytest
 
-from bots import RandomBot  # or whatever your default controller is
-from gym_env import TronEnv
+from src.bots import RandomBot  # or whatever your default controller is
+from src.gym_env import TronEnv
 
 
 @pytest.fixture

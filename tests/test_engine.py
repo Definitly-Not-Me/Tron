@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from engine import (
+from src.engine import (
 	Action,
 	Alive,
 	Autopsy,
