@@ -26,6 +26,7 @@ ignore = [
 [lint.per-file-ignores]
 "tests/**" = ["S101", "PLR2004", "E712", "RUF059"]
 "__init__.py" = ["F401"]    # allow unused imports in __init__
+"src/train.py" = ["PLR0915"]
 
 [format]
 quote-style = "double"
