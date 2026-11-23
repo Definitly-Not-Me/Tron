@@ -1,26 +1,27 @@
 # main.py
-import random
-import sys
-from random import choice
+import math
+from pathlib import Path
 
+import numpy as np
 import pygame
 
-from bots import BlockerBot, NaiveBot, RandomBot, WallHuggerBot
-from engine import Action, Dead, Direction, reset, step
-from render import Renderer
+from config import ARENA_DIM, FPS, LOOP_MUSIC
+from src.bots import BlockerBot, NaiveBot, RandomBot, WallHuggerBot
+from src.engine import Action, Alive, Dead, Direction, reset, step
+from src.model import Agent, AgentController
+from src.render import MainMenu, Renderer
 
-FPS = 25
-W, H = 64, 40
+WEIGHTS = "/home/encrid/Projets/tron-rl/logs/TRAINING-21-11-2026_21:42:22/WEIGHTS/TIER-1/weights_17499.npy"
+W, H = ARENA_DIM
 BOTS = [NaiveBot, BlockerBot, WallHuggerBot, RandomBot]
+SEED = 3
 
 
-def new_game(seed: int | None = None):
-	world = reset((W, H), seed=42)
-	bot = choice(BOTS)()
+def load_agent_controller(path: str | Path) -> AgentController:
+	a = Agent()
+	a.load(Path(path))
 
-	print("New game started with bot ", bot.name())
-
-	return world, bot
+	return AgentController(a)
 
 
 def human_action(keys, current_dir: Direction) -> tuple[Direction, bool]:
@@ -39,43 +40,99 @@ def human_action(keys, current_dir: Direction) -> tuple[Direction, bool]:
 def main():
 	pygame.init()
 
+	world = reset((W, H), SEED)
+	rng = np.random.default_rng()
+	rng.bit_generator.state = world.rng_state
+
+	renderer = Renderer(world)
 	clock = pygame.time.Clock()
-	world, bot = new_game(seed=42)
-	render = Renderer(world)
-	over = False
-	rng = random.Random(42)
+
+	pygame.mixer.init()
+	pygame.mixer.music.load(LOOP_MUSIC)
+	pygame.mixer.music.play(-1)
+
+	state = "menu"
+	countdown = 0.0
+	agent = load_agent_controller(WEIGHTS)
+	menu = MainMenu(renderer)
+	scores = (0, 0)
+	game_over_t = 1.0
 
 	while True:
+		dt = clock.tick(FPS) / 1000
+
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
-				render.quit()
-				sys.exit()
+				pygame.quit()
+				return
 
-		if over:
-			if pygame.key.get_pressed()[pygame.K_r]:
-				world, bot = new_game(42)
-				over = False
-			clock.tick(FPS)
-			continue
+			# BUG: infinite resize loop on wm like niri
+			if event.type == pygame.VIDEORESIZE:
+				renderer._center_arena()
+				if state == "menu":
+					menu._layout()
+			# 	renderer.handle_resize(event.w, event.h)
 
-		keys = pygame.key.get_pressed()
-		p1_dir, p1_boost = human_action(keys, world.players[0].direction)
-		p2_dir, p2_boost = bot.choose_move(world, 2, rng)
+			if state == "menu" and menu.handle_input(event):
+				world = reset((W, H))
+				countdown = 3.0
+				state = "countdown"
 
-		action = Action(
-			p1_dir=p1_dir, p2_dir=p2_dir, p1_boost=p1_boost, p2_boost=p2_boost
-		)
-		result = step(world, action)
+		match state:
+			case "menu":
+				menu.render()
+			case "countdown":
+				countdown -= dt
+				if countdown <= 0:
+					state = "game"
 
-		if isinstance(result, Dead):
-			over = True
-			render.draw_game_over(result.world, result.winner_id)
-			clock.tick(FPS)
-			continue
+				renderer.draw(world)
+				renderer.draw_countdown(math.ceil(countdown))
+			case "game":
+				keys = pygame.key.get_pressed()
+				player_dir, player_boost = human_action(
+					keys, world.players[0].direction
+				)
+				bot_dir, bot_boost = agent.choose_move(
+					world=world, bot_id=2, rng=rng
+				)
+				act = Action(
+					p1_dir=player_dir,
+					p2_dir=bot_dir,
+					p1_boost=player_boost,
+					p2_boost=bot_boost,
+				)
+				result = step(world, act)
 
-		world = result.world
-		render.draw(world)
-		clock.tick(FPS)
+				match result:
+					case Alive(w):
+						world = w
+						renderer.draw(world)
+						renderer.draw_hud(
+							scores,
+							tuple(p.boost_remaining for p in world.players),
+						)
+					case Dead(world=w, autopsy=_, winner_id=winner):
+						world = w
+						scores = tuple(
+							s + (1 if winner == i else 0)
+							for i, s in enumerate(scores, start=1)
+						)
+
+						last_winner = winner
+						state = "game_over"
+
+			case "game_over":
+				game_over_t -= dt
+				if game_over_t <= 0:
+					world = reset((W, H), SEED)
+					countdown = 3.0
+					state = "countdown"
+					game_over_t = 1.0
+				renderer.draw(world)
+				renderer.draw_game_over(world, last_winner)
+
+		pygame.display.flip()
 
 
 if __name__ == "__main__":
