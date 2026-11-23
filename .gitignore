@@ -233,3 +233,6 @@ devenv.local.yaml
 # python
 __pycache__/
 ./Tron 2D Versus Game Using Pygame in Python/
+
+# Private
+TODO.md
