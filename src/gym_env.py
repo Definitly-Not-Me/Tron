@@ -48,7 +48,7 @@ class TronEnv(gym.Env):
 		)
 		self.render_mode = render_mode
 		print("Render mode", render_mode)
-		self.renderer = Renderer(self.world) if render_mode == "human" else None
+		self.renderer = Renderer(self.world, render_mode or "")
 		self.max_ticks = max_ticks
 		self.clock = None
 
