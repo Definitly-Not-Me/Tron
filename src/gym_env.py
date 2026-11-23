@@ -146,6 +146,7 @@ class TronEnv(gym.Env):
 				# TODO: find a way to get real winner id
 				self.renderer.draw_game_over(self.world, winner_id)  # pyright: ignore
 
+			pygame.display.flip()
 			self.clock.tick(self.metadata["render_fps"])
 
 	def _get_reward(self, outcome: Dead | Alive, observation) -> float:

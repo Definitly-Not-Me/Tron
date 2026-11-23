@@ -16,6 +16,7 @@ from config import (
 	GREEN,
 	GRID_COLOR,
 	MARGIN,
+	MAX_BOOST,
 	P1_COLOR,
 	P2_COLOR,
 	PLAYERS_COLORS,
@@ -149,7 +150,59 @@ class Renderer:
 			border_radius=ARENA_BORDER_RADIUS,
 		)
 
-		pygame.display.flip()
+	def draw_hud(self, scores: tuple[int, int], boost: tuple[int, int]):
+		if self.screen is None:
+			return
+		screen_w = self.screen.get_width()
+		y = MARGIN
+		score_p1, score_p2 = scores
+
+		parts = [
+			(self.font_hud, "P1", WHITE),
+			(self.font_hud_bold, str(score_p1), P1_COLOR),
+			(self.font_hud, "  —  ", WHITE),
+			(self.font_hud_bold, str(score_p2), P2_COLOR),
+			(self.font_hud, "P2", WHITE),
+		]
+
+		surfaces = [f.render(t, True, c) for f, t, c in parts]
+		total_w = sum(s.get_width() for s in surfaces)
+		x = (screen_w - total_w) // 2
+
+		for s in surfaces:
+			self.screen.blit(s, (x, y))
+			x += s.get_width()
+
+		dy = y + self.font_hud_bold.get_height() + 8
+		bar_w, spacing = 8, 13
+		group_w = (MAX_BOOST - 1) * spacing + bar_w
+		centers = (
+			self.off_x + self.arena_w // 4,
+			self.off_x + 3 * self.arena_w // 4,
+		)
+		for cx, n in zip(centers, boost, strict=True):
+			left = cx - group_w // 2
+			for i in range(MAX_BOOST):
+				r = pygame.Rect(left + i * spacing, dy, bar_w, 8)
+				pygame.draw.rect(
+					self.screen,
+					GREEN if i < n else SM_BLACK,
+					r,
+					border_radius=2,
+				)
+
+	def draw_countdown(self, n: int = 3):
+		overlay = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
+		overlay.fill(BLACK_OVERLAY)
+
+		msg = "GO!" if n <= 0 else str(n)
+		color = GREEN if n <= 0 else WHITE
+		txt_srf = self.font_hud_bold.render(msg, True, color)
+
+		self.screen.blit(overlay, (0, 0))
+		self.screen.blit(
+			txt_srf, txt_srf.get_rect(center=self.screen.get_rect().center)
+		)
 
 	def draw_game_over(self, world: World, winner_id: int | None):
 		if self.screen is None:
