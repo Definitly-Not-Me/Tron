@@ -1,7 +1,5 @@
 from pathlib import Path
 
-import pygame
-
 ## Game visual
 FPS = 30
 ARENA_DIM = 64, 40
@@ -14,7 +12,7 @@ ARENA_BORDER_RADIUS = 8
 
 # Engine settings
 BOOST_SPEED_GAIN = 2
-STARTING_BOOST: int = 8
+MAX_BOOST: int = 8
 MIN_GRID = 14
 
 
