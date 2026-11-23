@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 ## Game visual
@@ -56,7 +57,7 @@ ARENA_BORDER_COLOR = (10, 14, 20)
 ARENA_BG = (0, 0, 1)
 
 # Misc
-WORKSPACE_DIR = Path(__file__).parent
+WORKSPACE_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).parent))
 assert WORKSPACE_DIR.exists()
 ASSETS = WORKSPACE_DIR / "assets"
 assert ASSETS.exists()
