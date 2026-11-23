@@ -13,10 +13,13 @@ from config import (
 	FONT_HUD,
 	FONT_HUD_BOLD,
 	FONT_MENU,
+	FONT_TITLE,
+	GOLD,
 	GREEN,
 	GRID_COLOR,
 	MARGIN,
 	MAX_BOOST,
+	MENU_BG,
 	P1_COLOR,
 	P2_COLOR,
 	PLAYERS_COLORS,
@@ -228,3 +231,65 @@ class Renderer:
 
 	def quit(self):
 		pygame.quit()
+
+
+class MainMenu:
+	def __init__(self, renderer: Renderer) -> None:
+		self.renderer = renderer
+		self._button = pygame.Rect(0, 0, 240, 60)
+		self.hovered = False
+		self.bg = pygame.image.load(MENU_BG)
+		self._scaled_bg = self.bg
+		self.font_title = pygame.font.Font(FONT_TITLE, 48)
+		self._layout()
+
+	def _layout(self):
+		w, h = self.renderer.screen.get_size()
+		self._button.center = (w // 2, h // 2)
+		self._scaled_bg = self._fit_cover(self.bg, w, h)
+
+	def _fit_cover(self, img: pygame.Surface, w: int, h: int):
+		iw, ih = self.bg.get_size()
+		scale = max(w / iw, h / ih)
+
+		return pygame.transform.smoothscale(
+			img, (int(iw * scale), int(ih * scale))
+		)
+
+	def handle_input(self, event):
+		match event.type:
+			case pygame.MOUSEMOTION:
+				self.hovered = self._button.collidepoint(event.pos)
+				return self.hovered
+			case pygame.MOUSEBUTTONDOWN if event.button == 1:
+				return self.hovered
+			case pygame.KEYDOWN if event.key == pygame.K_RETURN:
+				return True
+			case _:
+				return False
+
+	def render(self):
+		r = self.renderer
+
+		# NOTE: tied to infinite loop bug in main()
+		sw, sh = r.screen.get_size()
+		iw, ih = self._scaled_bg.get_size()
+		x, y = (sw - iw) // 2, (sh - ih) // 2
+
+		r.screen.blit(self._scaled_bg, (x, y))
+
+		r.add_text_center(
+			"Arrow keys or WASD to move. SPACE to boost",
+			int(0.1 * r.screen.get_height()),
+		)
+		btn_text = self.font_title.render(
+			"PLAY", True, WHITE if self.hovered else GOLD
+		)
+		button = self._button.inflate(12, 6) if self.hovered else self._button
+		pygame.draw.rect(
+			r.screen,
+			GREEN if self.hovered else SM_BLACK,
+			button,
+			border_radius=8,
+		)
+		r.screen.blit(btn_text, btn_text.get_rect(center=button.center))
