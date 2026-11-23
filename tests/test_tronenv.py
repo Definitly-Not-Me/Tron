@@ -2,7 +2,7 @@
 import numpy as np
 import pytest
 
-from src.bots import RandomBot  # or whatever your default controller is
+from src.bots import RandomBot
 from src.gym_env import TronEnv
 
 

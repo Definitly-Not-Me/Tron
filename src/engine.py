@@ -7,7 +7,7 @@ from itertools import takewhile
 
 import numpy as np
 
-from config import BOOST_SPEED_GAIN, MIN_GRID, STARTING_BOOST
+from config import BOOST_SPEED_GAIN, MAX_BOOST, MIN_GRID
 
 ### -------- Types -----------
 
@@ -40,7 +40,7 @@ class Player:
 	speed: int = 1
 	alive: bool = True
 	boost_active: bool = False
-	boost_remaining: int = STARTING_BOOST
+	boost_remaining: int = MAX_BOOST
 
 
 @dataclass(frozen=True)
