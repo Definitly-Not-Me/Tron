@@ -1,5 +1,7 @@
+from pathlib import Path
+
 ## Game visual
-FPS = 25
+FPS = 30
 ARENA_DIM = 64, 40
 CELL = 30
 MARGIN = 40
@@ -10,7 +12,7 @@ ARENA_BORDER_RADIUS = 8
 
 # Engine settings
 BOOST_SPEED_GAIN = 2
-STARTING_BOOST: int = 8
+MAX_BOOST: int = 8
 MIN_GRID = 14
 
 
@@ -47,6 +49,24 @@ GRID_COLOR = (30, 30, 30)
 WHITE = (225, 225, 225)
 GREEN = (0, 255, 0)
 GOLD = (255, 215, 0)
+SM_BLACK = (20, 20, 35)
+BLACK_OVERLAY = (0, 0, 0, 80)
 PLAYERS_COLORS = [P1_COLOR, P2_COLOR]
 ARENA_BORDER_COLOR = (10, 14, 20)
 ARENA_BG = (0, 0, 1)
+
+# Misc
+WORKSPACE_DIR = Path(__file__).parent
+assert WORKSPACE_DIR.exists()
+ASSETS = WORKSPACE_DIR / "assets"
+assert ASSETS.exists()
+FONT_MENU = ASSETS / "fonts" / "Orbitron" / "Orbitron-VariableFont_wght.ttf"
+
+FONT_TITLE = ASSETS / "fonts" / "Press_Start_2P" / "PressStart2P-Regular.ttf"
+
+FONT_HUD = ASSETS / "fonts" / "Orbitron" / "Orbitron-VariableFont_wght.ttf"
+
+FONT_HUD_BOLD = ASSETS / "fonts" / "Orbitron" / "static" / "Orbitron-Bold.ttf"
+MENU_BG = ASSETS / "menu.png"
+LOOP_MUSIC = ASSETS / "music" / "u_98o9hlkn7r-cyberpunk-music.ogg"
+CRASH_SOUND = ASSETS / "music" / "freesound_community-medium-explosion.ogg"
