@@ -9,6 +9,8 @@ Its performance isn't AlphaZero worthy but it occasionally manages to beat me.
 >[!NOTE]
 > This is a Work in Progress
 
+!["What it looks like"](./assets/demo.png)
+
 ## Getting started
 
 The main game only relies on the Pygame and Numpy libraries and a python 3.14 interpreter.
