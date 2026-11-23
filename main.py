@@ -5,13 +5,13 @@ from pathlib import Path
 import numpy as np
 import pygame
 
-from config import ARENA_DIM, FPS, LOOP_MUSIC
+from config import ARENA_DIM, ASSETS, FPS, LOOP_MUSIC
 from src.bots import BlockerBot, NaiveBot, RandomBot, WallHuggerBot
 from src.engine import Action, Alive, Dead, Direction, reset, step
 from src.model import Agent, AgentController
 from src.render import MainMenu, Renderer
 
-WEIGHTS = "/home/encrid/Projets/tron-rl/logs/TRAINING-21-11-2026_21:42:22/WEIGHTS/TIER-1/weights_17499.npy"
+WEIGHTS = ASSETS / "weights.npy"
 W, H = ARENA_DIM
 BOTS = [NaiveBot, BlockerBot, WallHuggerBot, RandomBot]
 SEED = 3
