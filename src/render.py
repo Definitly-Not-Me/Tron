@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 import pygame
 
@@ -33,15 +34,19 @@ from src.engine import World
 class Renderer:
 	def __init__(self, world: World, render_mode: str = "human") -> None:
 		height, width = world.grid.shape
+		info = pygame.display.Info()
+		window_h, window_w = int(info.current_h * 0.8), int(info.current_w * 0.8)
+		self.screen: Any | pygame.Surface = None
 		self.arena_w, self.arena_h = width * CELL, height * CELL
 		self.off_x = MARGIN
 		self.off_y = MARGIN
+		self.cell = CELL
 
 		if render_mode != "human":
 			os.environ["SDL_VIDEODRIVERS"] = "fake"
 		else:
 			self.screen = pygame.display.set_mode(
-				(self.arena_w + 2 * MARGIN, self.arena_h + 2 * MARGIN),
+				(window_h, window_w),
 				pygame.RESIZABLE,
 			)
 
@@ -50,6 +55,7 @@ class Renderer:
 			self.font_hud_bold = pygame.font.Font(FONT_HUD_BOLD, 48)
 			self.font_reg = pygame.font.Font(FONT_MENU, 38)
 
+			self._layout(world.grid.shape)
 			pygame.display.set_caption("Tron - Light Cycles")
 
 	def add_text(
@@ -63,6 +69,17 @@ class Renderer:
 		text_surface = f.render(msg, False, color)
 		self.screen.blit(text_surface, pos)
 
+	def _layout(self, arena_dim: tuple[int,int]):
+		g_w, g_h = arena_dim
+		s_w, s_h = self.screen.get_size()
+		self.cell = max(CELL, min(s_w // self.arena_w, s_h // self.arena_h))
+		self.arena_w = self.cell * g_w
+		self.arena_h = self.cell * g_h
+		self._center_arena()
+
+	def handle_resize(self, arena_dim: tuple[int,int], screen_dim: tuple[int,int]):
+		self._layout(arena_dim)
+
 	def add_text_center(
 		self,
 		msg: str,
@@ -75,16 +92,14 @@ class Renderer:
 		rect = text_surface.get_rect(center=(self.screen.get_width() // 2, y))
 		self.screen.blit(text_surface, rect)
 
-	def handle_resize(self, w: int, h: int):
-		self.screen = pygame.display.set_mode((w, h), pygame.RESIZABLE)
-		self._center_arena()
+
 
 	def _rect(self, x: int, y: int, margin: int = 0) -> pygame.Rect:
 		return pygame.Rect(
-			self.off_x + x * CELL + margin,
-			self.off_y + y * CELL + margin,
-			CELL - 2 * margin,
-			CELL - 2 * margin,
+			self.off_x + x * self.cell + margin,
+			self.off_y + y * self.cell + margin,
+			self.cell - 2 * margin,
+			self.cell - 2 * margin,
 		)
 
 	def _center_arena(self):
@@ -108,16 +123,16 @@ class Renderer:
 			pygame.draw.line(
 				self.screen,
 				GRID_COLOR,
-				(self.off_x + x * CELL, self.off_y),
-				(self.off_x + x * CELL, self.off_y + h * CELL),
+				(self.off_x + x * self.cell, self.off_y),
+				(self.off_x + x * self.cell, self.off_y + h * self.cell),
 			)
 
 		for y in range(h + 1):
 			pygame.draw.line(
 				self.screen,
 				GRID_COLOR,
-				(self.off_x, self.off_y + y * CELL),
-				(self.off_x + w * CELL, self.off_y + y * CELL),
+				(self.off_x, self.off_y + y * self.cell),
+				(self.off_x + w * self.cell, self.off_y + y * self.cell),
 			)
 
 		for y in range(h):
@@ -141,7 +156,7 @@ class Renderer:
 			pygame.draw.rect(
 				self.screen,
 				WHITE,
-				self._rect(p.x, p.y, CELL // 3),
+				self._rect(p.x, p.y, self.cell // 3),
 				border_radius=1,
 			)
 

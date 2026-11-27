@@ -68,10 +68,9 @@ def main():
 
 			# BUG: infinite resize loop on wm like niri
 			if event.type == pygame.VIDEORESIZE:
-				renderer._center_arena()
 				if state == "menu":
 					menu._layout()
-			# 	renderer.handle_resize(event.w, event.h)
+				renderer.handle_resize((world.grid.shape[1], world.grid.shape[0]), (event.w, event.h))
 
 			if state == "menu" and menu.handle_input(event):
 				world = reset((W, H))
