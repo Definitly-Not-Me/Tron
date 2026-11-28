@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 
 ## Game visual
-FPS = 30
+FPS = 16
 ARENA_DIM = 64, 40
 CELL = 30
 MARGIN = 40
