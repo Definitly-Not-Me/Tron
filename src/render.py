@@ -286,7 +286,7 @@ class MainMenu:
 		match event.type:
 			case pygame.MOUSEMOTION:
 				self.hovered = self._button.collidepoint(event.pos)
-				return self.hovered
+				return False
 			case pygame.MOUSEBUTTONDOWN if event.button == 1:
 				return self.hovered
 			case pygame.KEYDOWN if event.key == pygame.K_RETURN:
