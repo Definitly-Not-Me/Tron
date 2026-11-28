@@ -34,8 +34,6 @@ from src.engine import World
 class Renderer:
 	def __init__(self, world: World, render_mode: str = "human") -> None:
 		height, width = world.grid.shape
-		info = pygame.display.Info()
-		window_h, window_w = int(info.current_h * 0.8), int(info.current_w * 0.8)
 		self.screen: Any | pygame.Surface = None
 		self.arena_w, self.arena_h = width * CELL, height * CELL
 		self.off_x = MARGIN
@@ -45,8 +43,17 @@ class Renderer:
 		if render_mode != "human":
 			os.environ["SDL_VIDEODRIVERS"] = "fake"
 		else:
+			info = pygame.display.Info()
+			screen_w, screen_h = info.current_w, info.current_h
+			if screen_w > 0 and screen_h > 0:
+				scale = min(screen_w * 0.8 / width, screen_h * 0.8 / height)
+				window_w = max(1, int(width * scale))
+				window_h = max(1, int(height * scale))
+			else:
+				window_w, window_h = width * CELL, height * CELL
+
 			self.screen = pygame.display.set_mode(
-				(window_h, window_w),
+				(window_w, window_h),
 				pygame.RESIZABLE,
 			)
 
@@ -55,7 +62,7 @@ class Renderer:
 			self.font_hud_bold = pygame.font.Font(FONT_HUD_BOLD, 48)
 			self.font_reg = pygame.font.Font(FONT_MENU, 38)
 
-			self._layout(world.grid.shape)
+			self._layout((width, height))
 			pygame.display.set_caption("Tron - Light Cycles")
 
 	def add_text(
@@ -69,16 +76,22 @@ class Renderer:
 		text_surface = f.render(msg, False, color)
 		self.screen.blit(text_surface, pos)
 
-	def _layout(self, arena_dim: tuple[int,int]):
+	def _layout(
+		self,
+		arena_dim: tuple[int, int],
+		screen_dim: tuple[int, int] | None = None,
+	):
 		g_w, g_h = arena_dim
-		s_w, s_h = self.screen.get_size()
-		self.cell = max(CELL, min(s_w // self.arena_w, s_h // self.arena_h))
+		s_w, s_h = screen_dim or self.screen.get_size()
+		self.cell = max(1, min(s_w // g_w, s_h // g_h))
 		self.arena_w = self.cell * g_w
 		self.arena_h = self.cell * g_h
-		self._center_arena()
+		self._center_arena((s_w, s_h))
 
-	def handle_resize(self, arena_dim: tuple[int,int], screen_dim: tuple[int,int]):
-		self._layout(arena_dim)
+	def handle_resize(
+		self, arena_dim: tuple[int, int], screen_dim: tuple[int, int]
+	):
+		self._layout(arena_dim, screen_dim)
 
 	def add_text_center(
 		self,
@@ -92,8 +105,6 @@ class Renderer:
 		rect = text_surface.get_rect(center=(self.screen.get_width() // 2, y))
 		self.screen.blit(text_surface, rect)
 
-
-
 	def _rect(self, x: int, y: int, margin: int = 0) -> pygame.Rect:
 		return pygame.Rect(
 			self.off_x + x * self.cell + margin,
@@ -102,8 +113,8 @@ class Renderer:
 			self.cell - 2 * margin,
 		)
 
-	def _center_arena(self):
-		screen_w, screen_h = self.screen.get_size()
+	def _center_arena(self, screen_dim: tuple[int, int] | None = None):
+		screen_w, screen_h = screen_dim or self.screen.get_size()
 		self.off_x = (screen_w - self.arena_w) // 2
 		self.off_y = (screen_h - self.arena_h) // 2
 
